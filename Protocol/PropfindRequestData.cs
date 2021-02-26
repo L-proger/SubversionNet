@@ -24,7 +24,7 @@ namespace SubversionNet.Protocol {
 
     [Serializable]
     [XmlRoot("propfind", Namespace = WebDav.Namespaces.Dav)]
-    public class PropFindData {
+    public class PropFindRequestData {
         [XmlElement("prop", Namespace = WebDav.Namespaces.Dav)] 
         public PropData Prop = null;
         [XmlElement("allprop", Namespace = WebDav.Namespaces.Dav)] 

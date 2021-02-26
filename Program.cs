@@ -14,6 +14,8 @@ namespace SubversionNet {
             {
                 case "options":
                     return new OptionsRequestHandler(request);
+                case "propfind":
+                    return new PropfindRequestHandler(request);
                 default:
                     return null;
             }
@@ -22,15 +24,9 @@ namespace SubversionNet {
         static void Main(string[] args)
         {
             HttpListener listener = new HttpListener();
-            // установка адресов прослушки
             listener.Prefixes.Add("http://*:8080/");
             listener.Start();
-
-            //https://svn.antilatency.com:18080/svn/ACFA0Flasher_Alt_/trunk
-
-            //http://localhost:8080/RepoName/trunk
             Console.WriteLine("Listening...");
-            // Note: The GetContext method blocks while waiting for a request.
 
             while (true)
             {
@@ -54,10 +50,6 @@ namespace SubversionNet {
                 }
                 Console.WriteLine("Request done!");
             }
-
-
-
-
             listener.Stop();
         }
     }
