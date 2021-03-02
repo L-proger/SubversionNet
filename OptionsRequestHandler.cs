@@ -13,13 +13,17 @@ namespace SubversionNet {
 
         }
 
-        public override void handle() {
+        public override void handle(IServer server) {
 
             var requestData = _context.Request.ReadXml<OptionsRequestData>();
 
+            var repo = server.GetRepository(RequestUrl);
+            if (repo == null) {
+                throw new Exception("Repository not found!");
+            }
 
-            var acceptEncoding = _context.Request.Headers["Accept-Encoding"];
 
+      
             if (requestData == null) {
                 throw new Exception("Data is null");
             }
@@ -47,18 +51,18 @@ namespace SubversionNet {
             response.AppendHeader("Allow", "OPTIONS,GET,HEAD,POST,DELETE,TRACE,PROPFIND,PROPPATCH,COPY,MOVE,LOCK,UNLOCK,CHECKOUT");
 
             response.AppendHeader("SVN-Youngest-Rev", "0");
-            response.AppendHeader("SVN-Repository-UUID", "42eb9918-f851-4e6b-8a11-97df4a0a8802");
+            response.AppendHeader("SVN-Repository-UUID", repo.UUID.ToString());
             response.AppendHeader("SVN-Repository-MergeInfo", "yes");
 
             response.AppendHeader("DAV", "http://subversion.tigris.org/xmlns/dav/svn/replay-rev-resource");
-            response.AppendHeader("SVN-Repository-Root", "/svn/TestRepo");
-            response.AppendHeader("SVN-Me-Resource", "/svn/TestRepo/!svn/me");
-            response.AppendHeader("SVN-Rev-Root-Stub", "/svn/TestRepo/!svn/rvr");
-            response.AppendHeader("SVN-Rev-Stub", "/svn/TestRepo/!svn/rev");
-            response.AppendHeader("SVN-Txn-Root-Stub", "/svn/TestRepo/!svn/txr");
-            response.AppendHeader("SVN-Txn-Stub", "/svn/TestRepo/!svn/txn");
-            response.AppendHeader("SVN-VTxn-Root-Stub", "/svn/TestRepo/!svn/vtxr");
-            response.AppendHeader("SVN-VTxn-Stub", "/svn/TestRepo/!svn/vtxn");
+            response.AppendHeader("SVN-Repository-Root", server.UrlPrefix + "/" + repo.Name);
+            response.AppendHeader("SVN-Me-Resource", server.UrlPrefix + "/" + repo.Name + "/!svn/me");
+            response.AppendHeader("SVN-Rev-Root-Stub", server.UrlPrefix + "/" + repo.Name + "/!svn/rvr");
+            response.AppendHeader("SVN-Rev-Stub", server.UrlPrefix + "/" + repo.Name + "/!svn/rev");
+            response.AppendHeader("SVN-Txn-Root-Stub", server.UrlPrefix + "/" + repo.Name + "/!svn/txr");
+            response.AppendHeader("SVN-Txn-Stub", server.UrlPrefix + "/" + repo.Name + "/!svn/txn");
+            response.AppendHeader("SVN-VTxn-Root-Stub", server.UrlPrefix + "/" + repo.Name + "/!svn/vtxr");
+            response.AppendHeader("SVN-VTxn-Stub", server.UrlPrefix + "/" + repo.Name + "/!svn/vtxn");
             response.AppendHeader("SVN-Allow-Bulk-Updates", "On");
             response.AppendHeader("SVN-Supported-Posts", "create-txn");
             response.AppendHeader("SVN-Supported-Posts", "create-txn-with-props");
@@ -82,10 +86,9 @@ namespace SubversionNet {
 
 
 
-
             if (requestData.ActivityCollectionSet != null) {
                 responseData.ActivityCollectionSet = new ActivityCollectionSetData();
-                responseData.ActivityCollectionSet.href = "/svn/TestRepo/!svn/act/";
+                responseData.ActivityCollectionSet.href = server.UrlPrefix + "/" + repo.Name + "/!svn/act/";
             }
 
 

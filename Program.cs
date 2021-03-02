@@ -28,6 +28,8 @@ namespace SubversionNet {
             listener.Start();
             Console.WriteLine("Listening...");
 
+            FsServer server = new FsServer(@"F:\FsServerRoot", "/svn");
+            server.CreateRepository("TestRepo");
             while (true)
             {
                 HttpListenerContext context = listener.GetContext();
@@ -42,7 +44,7 @@ namespace SubversionNet {
                 var handler = GetRequestHandler(context);
                 if (handler != null)
                 {
-                    handler.handle();
+                    handler.handle(server);
                 }
                 else
                 {

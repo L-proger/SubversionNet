@@ -10,11 +10,33 @@ using ICSharpCode.SharpZipLib.GZip;
 namespace SubversionNet {
     abstract class RequestHandler {
         protected HttpListenerContext _context;
+
         public RequestHandler(HttpListenerContext context) {
             _context = context;
         }
 
-        public abstract void handle();
+
+        protected string RequestUrl => _context.Request.RawUrl;
+
+
+        protected string GetBaseRepoUrl(IServer server, IRepository repo)
+        {
+            return server.UrlPrefix + "/" + repo.Name;
+        }
+
+        protected string GetLocalRepoUrl(IServer server, IRepository repo)
+        {
+            var baseRepoUrl = GetBaseRepoUrl(server, repo);
+            if (!RequestUrl.StartsWith(baseRepoUrl))
+            {
+                throw new Exception("Unexpected base repo URL");
+            }
+            var result = RequestUrl.Substring(baseRepoUrl.Length + 1);
+            return result;
+        }
+
+
+        public abstract void handle(IServer server);
 
         protected void WriteResponse(byte[] data) {
             var acceptEncoding = _context.Request.Headers["Accept-Encoding"];
