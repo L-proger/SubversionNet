@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using SubversionNet.Protocol;
 
 namespace SubversionNet {
-    class PropfindRequestHandler : RequestHandler {
+    public class PropfindRequestHandler : RequestHandler {
         public PropfindRequestHandler(HttpListenerContext context) : base(context) {
         }
 

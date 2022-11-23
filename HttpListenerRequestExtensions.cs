@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -19,6 +20,18 @@ namespace SubversionNet {
             using var reader = XmlReader.Create(request.InputStream, readerSettings);
             reader.MoveToContent();
             return XmlUtils.Deserialize<T>(reader);
+        }
+
+        public static string ReadText(this HttpListenerRequest request)  {
+            if (request.ContentLength64 == 0) { 
+                return null;
+            }
+
+            var reader = new System.IO.StreamReader(request.InputStream);
+            var result = reader.ReadToEnd();
+            reader.Close();
+            return result;
+
         }
     }
 }

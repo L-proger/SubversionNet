@@ -5,10 +5,11 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using ICSharpCode.SharpZipLib.GZip;
 
 namespace SubversionNet {
-    abstract class RequestHandler {
+    public abstract class RequestHandler {
         protected HttpListenerContext _context;
 
         public RequestHandler(HttpListenerContext context) {
@@ -38,6 +39,14 @@ namespace SubversionNet {
 
         public abstract void handle(IServer server);
 
+
+        protected void WriteBadRequestResponse(string text = "BadRequest") {
+            // _context.Response.ContentType = "text/xml; charset=\"utf-8\"";
+            _context.Response.ContentEncoding = null;
+            _context.Response.StatusCode = 400;
+            WriteResponse(Encoding.UTF8.GetBytes(text));
+        }
+
         protected void WriteResponse(byte[] data) {
             var acceptEncoding = _context.Request.Headers["Accept-Encoding"];
 
@@ -46,7 +55,7 @@ namespace SubversionNet {
                 _context.Response.AppendHeader("Content-Encoding", "gzip");
                 var compressedData = GZipCompress(data);
 
-                File.WriteAllBytes("F:/wtf.gz", compressedData);
+               // File.WriteAllBytes("F:/wtf.gz", compressedData);
 
 
                 _context.Response.ContentLength64 = compressedData.Length;
@@ -67,6 +76,20 @@ namespace SubversionNet {
             gzs.Flush();
             gzs.Finish();
             return ms.ToArray();
+        }
+
+
+        public static T ParseXml<T>(string text) where T : class {
+            if (string.IsNullOrEmpty(text)) {
+                return null;
+            }
+
+            TextReader treader = new StringReader(text);
+
+            var readerSettings = new XmlReaderSettings { CloseInput = false };
+            using var reader = XmlReader.Create(treader, readerSettings);
+            reader.MoveToContent();
+            return XmlUtils.Deserialize<T>(reader);
         }
     }
 }

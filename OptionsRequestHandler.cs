@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using SubversionNet.Protocol;
 
 namespace SubversionNet {
-    class OptionsRequestHandler : RequestHandler {
+    public class OptionsRequestHandler : RequestHandler {
         public OptionsRequestHandler(HttpListenerContext context) : base(context) {
 
         }
